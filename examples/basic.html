@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DXF Viewer - Basic Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #viewer-container {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .info h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .info pre {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DXF Viewer - Basic Example</h1>
+
+        <div class="controls">
+            <input type="file" id="fileInput" accept=".dxf" />
+            <button id="loadExample">Load Example DXF</button>
+            <button id="zoomIn">Zoom In</button>
+            <button id="zoomOut">Zoom Out</button>
+            <button id="fitView">Fit to View</button>
+            <button id="resetView">Reset View</button>
+            <button id="exportPNG">Export PNG</button>
+        </div>
+
+        <div id="viewer-container"></div>
+
+        <div class="info">
+            <h3>Statistics</h3>
+            <pre id="stats">No file loaded</pre>
+        </div>
+    </div>
+
+    <script src="../dist/dxf-viewer.js"></script>
+    <script>
+        // Initialize viewer
+        const viewer = new DXFViewer({
+            container: '#viewer-container',
+            width: 1000,
+            height: 600,
+            backgroundColor: '#FFFFFF'
+        });
+
+        // Example DXF content
+        const exampleDXF = `0
+SECTION
+2
+HEADER
+9
+$ACADVER
+1
+AC1015
+0
+ENDSEC
+0
+SECTION
+2
+TABLES
+0
+TABLE
+2
+LAYER
+0
+LAYER
+2
+Contour
+62
+1
+0
+LAYER
+2
+Dimensions
+62
+3
+0
+ENDTAB
+0
+ENDSEC
+0
+SECTION
+2
+ENTITIES
+0
+LINE
+8
+Contour
+10
+0
+20
+0
+11
+100
+21
+0
+0
+LINE
+8
+Contour
+10
+100
+20
+0
+11
+100
+21
+50
+0
+LINE
+8
+Contour
+10
+100
+20
+50
+11
+0
+21
+50
+0
+LINE
+8
+Contour
+10
+0
+20
+50
+11
+0
+21
+0
+0
+LINE
+8
+Dimensions
+10
+-10
+20
+-10
+11
+110
+21
+-10
+0
+ENDSEC
+0
+EOF`;
+
+        // Update statistics display
+        function updateStats() {
+            const stats = viewer.getStats();
+            document.getElementById('stats').textContent = JSON.stringify(stats, null, 2);
+        }
+
+        // Event handlers
+        document.getElementById('loadExample').addEventListener('click', async () => {
+            try {
+                await viewer.loadString(exampleDXF);
+                updateStats();
+                console.log('Example DXF loaded successfully');
+            } catch (error) {
+                console.error('Error loading example:', error);
+                alert('Error loading example: ' + error.message);
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                await viewer.loadFile(file);
+                updateStats();
+                console.log('DXF file loaded successfully');
+            } catch (error) {
+                console.error('Error loading file:', error);
+                alert('Error loading file: ' + error.message);
+            }
+        });
+
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            viewer.zoomIn(1.5);
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            viewer.zoomOut(1.5);
+        });
+
+        document.getElementById('fitView').addEventListener('click', () => {
+            viewer.fitToView();
+        });
+
+        document.getElementById('resetView').addEventListener('click', () => {
+            viewer.resetView();
+        });
+
+        document.getElementById('exportPNG').addEventListener('click', () => {
+            const dataURL = viewer.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'drawing.png';
+            link.href = dataURL;
+            link.click();
+        });
+
+        // Load example on page load
+        window.addEventListener('load', () => {
+            document.getElementById('loadExample').click();
+        });
+    </script>
+</body>
+</html>
