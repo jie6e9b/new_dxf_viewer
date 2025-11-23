@@ -13,6 +13,7 @@ import TextRenderer from './core/renderer/renderers/TextRenderer.js';
 import MTextRenderer from './core/renderer/renderers/MTextRenderer.js';
 import PatternFactory from './core/renderer/patterns/PatternFactory.js';
 import HatchRenderer from './core/renderer/renderers/HatchRenderer.js';
+import DimensionRenderer from './core/renderer/renderers/DimensionRenderer.js';
 
 /**
  * DXFViewer - Main class for DXF viewer
@@ -47,6 +48,7 @@ class DXFViewer {
     this.textRenderer = new TextRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
     this.mtextRenderer = new MTextRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
     this.hatchRenderer = new HatchRenderer(this.canvasRenderer, this.tableManager, this.patternFactory);
+    this.dimensionRenderer = new DimensionRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
 
     // State
     this.loaded = false;
@@ -234,6 +236,11 @@ class DXFViewer {
       case 'HATCH':
         if (this.hatchRenderer.shouldRender(entity)) {
           this.hatchRenderer.render(entity);
+        }
+        break;
+      case 'DIMENSION':
+        if (this.dimensionRenderer.shouldRender(entity)) {
+          this.dimensionRenderer.render(entity);
         }
         break;
       default:

@@ -5,6 +5,7 @@ import ArcEntity from './ArcEntity.js';
 import TextEntity from './TextEntity.js';
 import MTextEntity from './MTextEntity.js';
 import HatchEntity from './HatchEntity.js';
+import DimensionEntity from './DimensionEntity.js';
 
 /**
  * Entity Factory - creates entity objects from parsed DXF data
@@ -20,7 +21,8 @@ class EntityFactory {
       ['ARC', ArcEntity.fromData],
       ['TEXT', TextEntity.fromData],
       ['MTEXT', MTextEntity.fromData],
-      ['HATCH', HatchEntity.fromData]
+      ['HATCH', HatchEntity.fromData],
+      ['DIMENSION', DimensionEntity.fromData]
     ]);
   }
 
