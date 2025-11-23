@@ -5,6 +5,9 @@ import EntityFactory from './core/parser/entities/EntityFactory.js';
 import SceneManager from './core/scene/SceneManager.js';
 import CanvasRenderer from './core/renderer/CanvasRenderer.js';
 import LineRenderer from './core/renderer/renderers/LineRenderer.js';
+import PolylineRenderer from './core/renderer/renderers/PolylineRenderer.js';
+import CircleRenderer from './core/renderer/renderers/CircleRenderer.js';
+import ArcRenderer from './core/renderer/renderers/ArcRenderer.js';
 
 /**
  * DXFViewer - Main class for DXF viewer
@@ -31,6 +34,9 @@ class DXFViewer {
 
     // Initialize renderers
     this.lineRenderer = new LineRenderer(this.canvasRenderer, this.tableManager);
+    this.polylineRenderer = new PolylineRenderer(this.canvasRenderer, this.tableManager);
+    this.circleRenderer = new CircleRenderer(this.canvasRenderer, this.tableManager);
+    this.arcRenderer = new ArcRenderer(this.canvasRenderer, this.tableManager);
 
     // State
     this.loaded = false;
@@ -189,7 +195,22 @@ class DXFViewer {
           this.lineRenderer.render(entity);
         }
         break;
-      // More entity types will be added in Phase 2
+      case 'POLYLINE':
+      case 'LWPOLYLINE':
+        if (this.polylineRenderer.shouldRender(entity)) {
+          this.polylineRenderer.render(entity);
+        }
+        break;
+      case 'CIRCLE':
+        if (this.circleRenderer.shouldRender(entity)) {
+          this.circleRenderer.render(entity);
+        }
+        break;
+      case 'ARC':
+        if (this.arcRenderer.shouldRender(entity)) {
+          this.arcRenderer.render(entity);
+        }
+        break;
       default:
         // Unknown entity type
         break;

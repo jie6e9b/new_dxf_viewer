@@ -1,4 +1,7 @@
 import LineEntity from './LineEntity.js';
+import PolylineEntity from './PolylineEntity.js';
+import CircleEntity from './CircleEntity.js';
+import ArcEntity from './ArcEntity.js';
 
 /**
  * Entity Factory - creates entity objects from parsed DXF data
@@ -7,8 +10,11 @@ class EntityFactory {
   constructor() {
     // Register entity parsers
     this.parsers = new Map([
-      ['LINE', LineEntity.fromData]
-      // More entity types will be added in Phase 2
+      ['LINE', LineEntity.fromData],
+      ['POLYLINE', PolylineEntity.fromData],
+      ['LWPOLYLINE', PolylineEntity.fromData], // Lightweight polyline uses same parser
+      ['CIRCLE', CircleEntity.fromData],
+      ['ARC', ArcEntity.fromData]
     ]);
   }
 

@@ -601,4 +601,307 @@ EOF`;
     // Scale should not change
     expect(viewer.canvasRenderer.transform.scale).toBe(initialScale);
   });
+
+  // Phase 2: Primitive entities tests
+
+  test('loads and renders CIRCLE entity', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+CIRCLE
+8
+0
+10
+50
+20
+50
+40
+25
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    expect(viewer.loaded).toBe(true);
+    expect(viewer.sceneManager.getEntityCount()).toBe(1);
+    const entities = viewer.sceneManager.getEntities();
+    expect(entities[0].type).toBe('CIRCLE');
+    expect(entities[0].center).toEqual({ x: 50, y: 50, z: 0 });
+    expect(entities[0].radius).toBe(25);
+  });
+
+  test('loads and renders ARC entity', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+ARC
+8
+0
+10
+100
+20
+100
+40
+50
+50
+0
+51
+90
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    expect(viewer.loaded).toBe(true);
+    expect(viewer.sceneManager.getEntityCount()).toBe(1);
+    const entities = viewer.sceneManager.getEntities();
+    expect(entities[0].type).toBe('ARC');
+    expect(entities[0].center).toEqual({ x: 100, y: 100, z: 0 });
+    expect(entities[0].radius).toBe(50);
+    expect(entities[0].startAngle).toBe(0);
+    expect(entities[0].endAngle).toBe(90);
+  });
+
+  test('loads and renders POLYLINE entity', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+POLYLINE
+8
+0
+90
+3
+10
+0
+20
+0
+10
+100
+20
+0
+10
+100
+20
+100
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    expect(viewer.loaded).toBe(true);
+    expect(viewer.sceneManager.getEntityCount()).toBe(1);
+    const entities = viewer.sceneManager.getEntities();
+    expect(entities[0].type).toBe('POLYLINE');
+    expect(entities[0].vertices).toHaveLength(3);
+  });
+
+  test('renders POLYLINE with bulge (arc segment)', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+POLYLINE
+8
+0
+10
+0
+20
+0
+42
+0.5
+10
+100
+20
+0
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    const entities = viewer.sceneManager.getEntities();
+    expect(entities[0].vertices[0].bulge).toBe(0.5);
+    expect(() => viewer.render()).not.toThrow();
+  });
+
+  test('calculates correct bounds for CIRCLE', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+CIRCLE
+10
+100
+20
+100
+40
+50
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    const stats = viewer.getStats();
+    expect(stats.bounds.minX).toBe(50);
+    expect(stats.bounds.minY).toBe(50);
+    expect(stats.bounds.maxX).toBe(150);
+    expect(stats.bounds.maxY).toBe(150);
+  });
+
+  test('calculates correct bounds for ARC', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+ARC
+10
+0
+20
+0
+40
+10
+50
+0
+51
+90
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    const stats = viewer.getStats();
+    expect(stats.bounds.minX).toBeCloseTo(0, 1);
+    expect(stats.bounds.minY).toBeCloseTo(0, 1);
+    expect(stats.bounds.maxX).toBeCloseTo(10, 1);
+    expect(stats.bounds.maxY).toBeCloseTo(10, 1);
+  });
+
+  test('handles mixed entity types', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+LINE
+10
+0
+20
+0
+11
+50
+21
+50
+0
+CIRCLE
+10
+100
+20
+100
+40
+25
+0
+ARC
+10
+200
+20
+200
+40
+30
+50
+0
+51
+180
+0
+POLYLINE
+90
+2
+10
+0
+20
+200
+10
+50
+20
+250
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    expect(viewer.sceneManager.getEntityCount()).toBe(4);
+    const stats = viewer.getStats();
+    expect(stats.entities.byType.LINE).toBe(1);
+    expect(stats.entities.byType.CIRCLE).toBe(1);
+    expect(stats.entities.byType.ARC).toBe(1);
+    expect(stats.entities.byType.POLYLINE).toBe(1);
+
+    expect(() => viewer.render()).not.toThrow();
+  });
+
+  test('renders closed POLYLINE', async () => {
+    const dxf = `0
+SECTION
+2
+ENTITIES
+0
+POLYLINE
+70
+1
+10
+0
+20
+0
+10
+100
+20
+0
+10
+100
+20
+100
+10
+0
+20
+100
+0
+ENDSEC
+0
+EOF`;
+
+    const viewer = new DXFViewer({ container: canvas });
+    await viewer.loadString(dxf);
+
+    const entities = viewer.sceneManager.getEntities();
+    expect(entities[0].closed).toBe(true);
+    expect(() => viewer.render()).not.toThrow();
+  });
 });
