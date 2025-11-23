@@ -8,6 +8,9 @@ import LineRenderer from './core/renderer/renderers/LineRenderer.js';
 import PolylineRenderer from './core/renderer/renderers/PolylineRenderer.js';
 import CircleRenderer from './core/renderer/renderers/CircleRenderer.js';
 import ArcRenderer from './core/renderer/renderers/ArcRenderer.js';
+import FontManager from './core/renderer/fonts/FontManager.js';
+import TextRenderer from './core/renderer/renderers/TextRenderer.js';
+import MTextRenderer from './core/renderer/renderers/MTextRenderer.js';
 
 /**
  * DXFViewer - Main class for DXF viewer
@@ -31,12 +34,15 @@ class DXFViewer {
     this.entityFactory = new EntityFactory();
     this.sceneManager = new SceneManager();
     this.canvasRenderer = new CanvasRenderer(this.canvas);
+    this.fontManager = new FontManager();
 
     // Initialize renderers
     this.lineRenderer = new LineRenderer(this.canvasRenderer, this.tableManager);
     this.polylineRenderer = new PolylineRenderer(this.canvasRenderer, this.tableManager);
     this.circleRenderer = new CircleRenderer(this.canvasRenderer, this.tableManager);
     this.arcRenderer = new ArcRenderer(this.canvasRenderer, this.tableManager);
+    this.textRenderer = new TextRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
+    this.mtextRenderer = new MTextRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
 
     // State
     this.loaded = false;
@@ -209,6 +215,16 @@ class DXFViewer {
       case 'ARC':
         if (this.arcRenderer.shouldRender(entity)) {
           this.arcRenderer.render(entity);
+        }
+        break;
+      case 'TEXT':
+        if (this.textRenderer.shouldRender(entity)) {
+          this.textRenderer.render(entity);
+        }
+        break;
+      case 'MTEXT':
+        if (this.mtextRenderer.shouldRender(entity)) {
+          this.mtextRenderer.render(entity);
         }
         break;
       default:

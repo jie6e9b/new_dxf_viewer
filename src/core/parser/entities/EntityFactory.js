@@ -2,6 +2,8 @@ import LineEntity from './LineEntity.js';
 import PolylineEntity from './PolylineEntity.js';
 import CircleEntity from './CircleEntity.js';
 import ArcEntity from './ArcEntity.js';
+import TextEntity from './TextEntity.js';
+import MTextEntity from './MTextEntity.js';
 
 /**
  * Entity Factory - creates entity objects from parsed DXF data
@@ -14,7 +16,9 @@ class EntityFactory {
       ['POLYLINE', PolylineEntity.fromData],
       ['LWPOLYLINE', PolylineEntity.fromData], // Lightweight polyline uses same parser
       ['CIRCLE', CircleEntity.fromData],
-      ['ARC', ArcEntity.fromData]
+      ['ARC', ArcEntity.fromData],
+      ['TEXT', TextEntity.fromData],
+      ['MTEXT', MTextEntity.fromData]
     ]);
   }
 
