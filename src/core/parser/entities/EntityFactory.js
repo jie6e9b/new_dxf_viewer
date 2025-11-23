@@ -4,6 +4,7 @@ import CircleEntity from './CircleEntity.js';
 import ArcEntity from './ArcEntity.js';
 import TextEntity from './TextEntity.js';
 import MTextEntity from './MTextEntity.js';
+import HatchEntity from './HatchEntity.js';
 
 /**
  * Entity Factory - creates entity objects from parsed DXF data
@@ -18,7 +19,8 @@ class EntityFactory {
       ['CIRCLE', CircleEntity.fromData],
       ['ARC', ArcEntity.fromData],
       ['TEXT', TextEntity.fromData],
-      ['MTEXT', MTextEntity.fromData]
+      ['MTEXT', MTextEntity.fromData],
+      ['HATCH', HatchEntity.fromData]
     ]);
   }
 

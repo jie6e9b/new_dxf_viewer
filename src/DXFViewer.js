@@ -11,6 +11,8 @@ import ArcRenderer from './core/renderer/renderers/ArcRenderer.js';
 import FontManager from './core/renderer/fonts/FontManager.js';
 import TextRenderer from './core/renderer/renderers/TextRenderer.js';
 import MTextRenderer from './core/renderer/renderers/MTextRenderer.js';
+import PatternFactory from './core/renderer/patterns/PatternFactory.js';
+import HatchRenderer from './core/renderer/renderers/HatchRenderer.js';
 
 /**
  * DXFViewer - Main class for DXF viewer
@@ -35,6 +37,7 @@ class DXFViewer {
     this.sceneManager = new SceneManager();
     this.canvasRenderer = new CanvasRenderer(this.canvas);
     this.fontManager = new FontManager();
+    this.patternFactory = new PatternFactory();
 
     // Initialize renderers
     this.lineRenderer = new LineRenderer(this.canvasRenderer, this.tableManager);
@@ -43,6 +46,7 @@ class DXFViewer {
     this.arcRenderer = new ArcRenderer(this.canvasRenderer, this.tableManager);
     this.textRenderer = new TextRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
     this.mtextRenderer = new MTextRenderer(this.canvasRenderer, this.tableManager, this.fontManager);
+    this.hatchRenderer = new HatchRenderer(this.canvasRenderer, this.tableManager, this.patternFactory);
 
     // State
     this.loaded = false;
@@ -225,6 +229,11 @@ class DXFViewer {
       case 'MTEXT':
         if (this.mtextRenderer.shouldRender(entity)) {
           this.mtextRenderer.render(entity);
+        }
+        break;
+      case 'HATCH':
+        if (this.hatchRenderer.shouldRender(entity)) {
+          this.hatchRenderer.render(entity);
         }
         break;
       default:
